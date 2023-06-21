@@ -7,7 +7,7 @@
 # de Energia de Carros Elétricos
 
 # Muda o diretório de trabalho
-setwd('/Projeto01/dataset')
+setwd('/Projeto01')
 getwd()
 
 # Carrega os pacotes
@@ -20,7 +20,7 @@ library(gridExtra)
 library(randomForest)
 
 # Carrega dataframe
-df <- read_excel('FEV-data-Excel.xlsx')
+df <- read_excel('dataset/FEV-data-Excel.xlsx')
 
 # Dimensões
 dim(df)
@@ -41,7 +41,7 @@ colSums(is.na(df))
 df1 <- na.omit(df)
 sum(is.na(df1))
 dim(df1)
-(nrow(df) - nrow(df1))/nrow(df)
+(nrow(df) - nrow(df1))/nrow(df) # Percentual de linhas removidas em relação ao dataset original.
 
 # Ao total, 9 observações com valores NA foram removidas,
 # representando 20,7% do dataframe original.
@@ -100,11 +100,12 @@ View(df1)
 summary(df1)
 
 # A variável alvo é a 'Energy_Consumption'
-hist(df1$Energy_Consumption, 
+png('plots/plot1.png', width = 600, height = 480) # Salvando plot em um PNG
+plot(x=c(1:42), y=df1$Energy_Consumption, 
      main = 'Consumo de Energia Médio em kWH/100km',
-     xlab = 'Consumo de Energia',
-     ylab = 'Frequência',
-     breaks = 15)
+     xlab = 'Nº do Carro (42 ao total)',
+     ylab = 'Consumo de Energia (kWH/100km)')
+dev.off()
 
 # ANÁLISE EXPLORATÓRIA #
 
@@ -114,11 +115,13 @@ hist(df1$Energy_Consumption,
 Consumo_Marcas <- ggplot(df1, aes(x=Make, y=Energy_Consumption, fill=Drive_Type)) +
   geom_boxplot() +
   labs(title = 'Consumo de Energia por Marca', 
-       y = 'Consumo de Energia',
+       y = 'Consumo de Energia (kWH/100km)',
        x = 'Marca',
-       fill = 'Tração') +
+       fill = 'Tipo de Tração') +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
+png('plots/plot2.png', width = 600, height = 480) # Salvando plot em um PNG
 Consumo_Marcas
+dev.off()
 
 # Neste plot percebe-se que cada tipo de tração possui consumos de energia
 # semelhantes. Uma marca (Citroën) é um outlier.
@@ -126,12 +129,14 @@ Consumo_Marcas_por_Tracao <- ggplot(df1, aes(x=Make, y=Energy_Consumption,
                                              fill=Drive_Type)) +
   geom_boxplot() +
   labs(title = 'Consumo de Energia por Marca', 
-       y = 'Consumo de Energia',
+       y = 'Consumo de Energia (kWH/100km)',
        x = 'Marca',
-       fill = 'Tração') +
+       fill = 'Tipo de Tração') +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
   facet_wrap(~Drive_Type, scale="free")
+png('plots/plot3.png', width = 600, height = 480) # Salvando plot em um PNG
 Consumo_Marcas_por_Tracao
+dev.off()
 
 # Como visto acima, os carros com tração nas 4 rodas consomem mais
 # energia comparado aos de tração em 2 rodas. O plot abaixo resume
@@ -140,10 +145,12 @@ Consumo_Tracao <- ggplot(df1, aes(x=Drive_Type, y=Energy_Consumption,
                                   fill=Drive_Type)) +
   geom_boxplot() +
   labs(title = 'Consumo de Energia por Tração', 
-       y = 'Consumo de Energia',
+       y = 'Consumo de Energia (kWH/100km)',
        x = 'Tipo de Tração',
-       fill = 'Tração')
+       fill = 'Tipo de Tração')
+png('plots/plot4.png', width = 600, height = 480) # Salvando plot em um PNG
 Consumo_Tracao
+dev.off()
 
 # Boxplot do consumo de energia de acordo com tipo de freio (a disco
 # frontal + traseiro e a disco frontal + tambor traseiro) e os tipos
@@ -152,28 +159,34 @@ Consumo_Freio <- ggplot(df1, aes(x=Brakes_Type, y=Energy_Consumption,
                                  fill=Drive_Type)) +
   geom_boxplot() +
   labs(title = 'Consumo de Energia por Freio', 
-       y = 'Consumo de Energia',
+       y = 'Consumo de Energia (kWH/100km)',
        x = 'Tipo de Freio',
        fill = 'Tração')
+png('plots/plot5.png', width = 600, height = 480) # Salvando plot em um PNG
 Consumo_Freio
+dev.off()
 
 # Boxplot do consumo de energia de acordo com número de assentos.
 Consumo_Assentos <- ggplot(df1, aes(x=Seats, y=Energy_Consumption, fill=Seats)) +
   geom_boxplot() +
   labs(title = 'Consumo de Energia por Assentos', 
-       y = 'Consumo de Energia',
+       y = 'Consumo de Energia (kWH/100km)',
        x = 'Numero de Assentos',
        fill = 'Nº Assentos')
+png('plots/plot6.png', width = 600, height = 480) # Salvando plot em um PNG
 Consumo_Assentos
+dev.off()
 
 # Boxplot do consumo de energia de acordo com número de portas.
 Consumo_Portas <- ggplot(df1, aes(x=Doors, y=Energy_Consumption, fill=Doors)) +
   geom_boxplot() +
   labs(title = 'Consumo de Energia por Portas', 
-       y = 'Consumo de Energia',
+       y = 'Consumo de Energia (kWh/100km)',
        x = 'Numero de Assentos',
        fill = 'Nº Portas')
+png('plots/plot7.png', width = 600, height = 480) # Salvando plot em um PNG
 Consumo_Portas
+dev.off()
 
 # Agrupando dados do tipo fator para gerar gráficos do tipo pizza
 # mostrando o número total de cada tipo.
@@ -230,8 +243,9 @@ plot4 <- ggplot(Doors_Total, aes(x="", y=total_type, fill=Doors))+
        fill = 'Nº de Portas')
 
 # Gráficos de pizza agrupados
+png('plots/plot8.png', width = 600, height = 480) # Salvando plot em um PNG
 grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
-
+dev.off()
 
 # ANÁLISE DE REGRESSÃO LINEAR #
 
@@ -260,7 +274,9 @@ summary(lm(formula, data = df1))
 
 # Após a primeira verificação, foram removidas outras variáveis que tem pouca
 # ou nenhuma influência para o modelo.
-formula2 <- Energy_Consumption ~ . - Car_Name - Make - Model - Doors - Batt_Cap - Seats - Height - Brakes_Type - Range - Acc_0_100 - Max_DC_Charg - Max_Speed - Width - Drive_Type - Boot_Cap
+formula2 <- Energy_Consumption ~ . - Car_Name - Make - Model - Doors - 
+  Batt_Cap - Seats - Height - Brakes_Type - Range - Acc_0_100 - 
+  Max_DC_Charg - Max_Speed - Width - Drive_Type - Boot_Cap
 
 modelo2 <- randomForest(formula2, 
                        data = df1, 
@@ -276,7 +292,8 @@ summary(lm(formula2, data = df1))
 
 # Reduzindo mais um pouco o número de variáveis e fazendo algumas combinações
 # entre elas, encontraram-se as variáveis abaixo que melhor explicam o modelo.
-formula3 <- Energy_Consumption ~ Max_Torque + Length + Perm_Gross_Weight + Max_Load_Cap + Tire_Size
+formula3 <- Energy_Consumption ~ Max_Torque + Length + 
+  Perm_Gross_Weight + Max_Load_Cap + Tire_Size
 
 modelo3 <- randomForest(formula3, 
                         data = df1, 
@@ -305,11 +322,13 @@ Comparativo_Modelos <- ggplot(df2) +
   geom_line(aes(x = c(1:42), y = Energy_Consumption, colour="Consumo_Dataset_Original"), size = 1.25) + 
   geom_line(aes(x = c(1:42), y = Previsao, colour="Consumo_Previsao"), size = 1.25) +
   scale_color_manual(name = "Legenda", values = c("Consumo_Dataset_Original" = "darkblue", "Consumo_Previsao" = "red")) +
-  labs(title = 'Comparação entre variável alvo e variável prevista', 
-       y = 'Consumo de Energia',
-       x = 'Carros')
+  labs(title = 'Comparação entre variável alvo e variável prevista (ordenado de forma crescente)', 
+       y = 'Consumo de Energia (kWH/100km)',
+       x = 'Carros (42 ao total)')
+png('plots/plot8.png', width = 800, height = 480) # Salvando plot em um PNG
 Comparativo_Modelos
-  
+dev.off()
+
 # Como vimos no gráfico anterior, o modelo de machine learning
 # conseguiu obter resultados aproximados ao dataset inicial. Assim, o modelo
 # obteve grau satisfatório.
