@@ -9,7 +9,7 @@
 # de Energia de Carros Elétricos
 
 # Muda o diretório de trabalho
-setwd('C:/FCD/BigDataRAzure/Cap20/Projeto01')
+setwd('../Projeto01')
 getwd()
 
 # Caso seja necessário instalar um pacote
